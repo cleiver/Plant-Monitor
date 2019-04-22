@@ -1,35 +1,32 @@
-/*  
- *  Humidity sensor to water on plants
- */
+#include <LCD5110_Basic.h>
 
-// pins to use
-const int buzzer = 11;
-const int sensor = A0;
+/* LCD5110(CLK, DIN, DC, RST, CE) */
+LCD5110 tela(5, 4, 3, 1, 2);
 
-// When we'll consider the land dry enought to water it
-const int checkpoint = 700;
 
-void setup() {
-  Serial.begin(9600);
+const int sensorUmidade = A0;
+const int sensorTemperatura = A5;
+ 
+//Obtendo as fontes
+extern uint8_t SmallFont[];
+extern uint8_t MediumNumbers[];
+extern uint8_t BigNumbers[];
+ 
+void setup()
+{
+ tela.InitLCD(); //Inicializando o display
+ Serial.begin(9600);
+
 }
+ 
+void loop()
+{
+  int valorUmidade = analogRead(sensorUmidade);
+  float valorTemperatura = (analogRead(sensorTemperatura) * 0.004887585533) / 0.01;
 
-void loop() {
-  int sensorValue = analogRead(sensor);
+  tela.setFont(SmallFont);
+  tela.print("Umidade: " + String(valorUmidade), LEFT, 0);
+  tela.print("Temp.: " + String(valorTemperatura), LEFT, 20);
 
-  if (sensorValue > checkpoint) {
-    // makes a screechy sound to alert us
-    tone(buzzer, 40, 400);
-  } else {
-    // makes a light sound just so we know it's reding and bellow the checkpoint
-    tone(buzzer, 3000, 100);
-  }
-
-  // log
-  Serial.print("Checkpoint: ");
-  Serial.print(checkpoint);
-  Serial.print(" Sensor: ");
-  Serial.println(sensorValue);
-
-  // halt and go
   delay(1000);
 }
